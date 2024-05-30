@@ -13,6 +13,34 @@
       cursor: pointer;
       margin-top: -10px;
     }
+
+
+    #delete {
+      cursor: pointer;
+      padding-left: 24px;
+      margin-bottom: -1px;
+      opacity: 0.5;
+    }
+
+
+    #delete:hover {
+      cursor: pointer;
+      padding-left: 24px;
+      margin-bottom: -1px;
+      opacity: 1;
+    }
+
+    #file_item{
+      display: block;
+    }
+
+
+    #convert-button{
+      width: 100%;
+      background-color: blue;
+      padding: 10px;
+      border-radius: 100px;
+    }
   </style>
   </head>
 
@@ -29,9 +57,10 @@
             
         <div id="drop-zone" style="border-radius: 8px; border: 2px dashed #ccc; padding: 40px; text-align: center;">
           <p style = 'margin: 0px;'>Drag & Drop files here</p>
-          or <label for="file-upload" class="custom-file-upload" multiple> Choose Files </label>
-          <input id="file-upload" type="file" />
+          or <label for="file-upload" class="custom-file-upload"> Choose Files </label>
+          <input id="file-upload" type="file" multiple/>
           <div id="file-list"></div>
+          <div id="convert-button">Convert Files</div>
         </div>
 
       </div>
@@ -233,13 +262,18 @@
               .then(response => {
                   // Handle the response from the server
                   console.log('File uploaded successfully!');
-                  const deleteButton = document.createElement('button');
-                  deleteButton.textContent = 'Delete';
+                  const deleteButton = document.createElement('img');
+                  deleteButton.setAttribute("id", "delete");
+                  deleteButton.src='assets/delete.svg';
+
                   deleteButton.addEventListener('click', function() {
                       fileList.removeChild(fileItem);
                   });
       
+                  const fileCon = document.createElement('div');
+
                   const fileItem = document.createElement('div');
+                  fileItem.setAttribute("id", "file_item");
                   fileItem.innerHTML = `<p>${file.name}</p>`;
                   fileItem.appendChild(deleteButton);
                   fileList.appendChild(fileItem);
