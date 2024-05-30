@@ -15,11 +15,23 @@
     }
 
 
+    #file_item{
+      display: block;
+      height: 30px;
+      margin-bottom: 24px;
+    }
+
+    .file_name{
+      vertical-align:middle; 
+      float: left;
+      margin: 0;
+    }
+
     #delete {
       cursor: pointer;
-      padding-left: 24px;
-      margin-bottom: -1px;
+      padding-top: 5px;
       opacity: 0.5;
+      float: right;
     }
 
 
@@ -30,17 +42,15 @@
       opacity: 1;
     }
 
-    #file_item{
-      display: block;
-    }
-
-
     #convert-button{
       width: 100%;
       background-color: blue;
       padding: 10px;
       border-radius: 100px;
+      display: none; /* Initially hidden */
     }
+
+
   </style>
   </head>
 
@@ -56,7 +66,7 @@
       <div class="content">
             
         <div id="drop-zone" style="border-radius: 8px; border: 2px dashed #ccc; padding: 40px; text-align: center;">
-          <p style = 'margin: 0px;'>Drag & Drop files here</p>
+          <p style = 'margin: 0px;'>Drag & Drop files here</p><br>
           or <label for="file-upload" class="custom-file-upload"> Choose Files </label>
           <input id="file-upload" type="file" multiple/>
           <div id="file-list"></div>
@@ -206,6 +216,11 @@
       document.addEventListener('DOMContentLoaded', function() {
           const dropZone = document.getElementById('drop-zone');
           const fileList = document.getElementById('file-list');
+
+          const convertButton = document.getElementById('convert-button');
+          const fileInput = document.getElementById('file-upload');
+            let filesArray = [];
+
       
           // Prevent default drag behaviors
           ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -225,6 +240,10 @@
           // Handle dropped files
           dropZone.addEventListener('drop', handleDrop, false);
       
+          fileInput.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
+            
           function preventDefaults(e) {
               e.preventDefault();
               e.stopPropagation();
@@ -245,49 +264,50 @@
               handleFiles(files);
           }
       
+
           function handleFiles(files) {
-              [...files].forEach(uploadFile);
-          }
-      
-          function uploadFile(file) {
-              const url = 'YOUR_UPLOAD_URL_HERE'; // Replace with your upload URL
-              const formData = new FormData();
-              formData.append('file', file);
-      
-              // You can use fetch or XMLHttpRequest to upload the file
-              fetch(url, {
-                  method: 'POST',
-                  body: formData
-              })
-              .then(response => {
-                  // Handle the response from the server
-                  console.log('File uploaded successfully!');
-                  const deleteButton = document.createElement('img');
-                  deleteButton.setAttribute("id", "delete");
-                  deleteButton.src='assets/delete.svg';
+                [...files].forEach(file => {
+                    if (!filesArray.includes(file)) {
+                        filesArray.push(file);
+                        uploadFile(file);
+                    }
+                });
+                toggleConvertButton();
+            }
 
-                  deleteButton.addEventListener('click', function() {
-                      fileList.removeChild(fileItem);
-                  });
-      
-                  const fileCon = document.createElement('div');
+            function uploadFile(file) {
+                const url = 'YOUR_UPLOAD_URL_HERE'; // Replace with your upload URL
+                const formData = new FormData();
+                formData.append('file', file);
 
-                  const fileItem = document.createElement('div');
-                  fileItem.setAttribute("id", "file_item");
-                  fileItem.innerHTML = `<p>${file.name}</p>`;
-                  fileItem.appendChild(deleteButton);
-                  fileList.appendChild(fileItem);
-              })
-              .catch(error => {
-                  console.error('Error uploading file:', error);
-              });
-          }
-      
-          // Listen for file input change for traditional file selection
-          const fileInput = document.getElementById('file-upload');
-          fileInput.addEventListener('change', function() {
-              handleFiles(this.files);
-          });
+                const file_item = document.createElement('div');
+                file_item.setAttribute('id', 'file_item');
+                file_item.innerHTML = `<p class='file_name'>${file.name}</p>`;
+
+                const deleteButton = document.createElement('img');
+                deleteButton.setAttribute("id", "delete");
+                deleteButton.src='assets/delete.svg';
+                file_item.appendChild(deleteButton);
+
+                fileList.appendChild(file_item);
+
+                file_item.querySelector('#delete').addEventListener('click', () => {
+                    file_item.remove();
+                    filesArray = filesArray.filter(f => f !== file);
+                    toggleConvertButton();
+                });
+
+            }
+
+            function toggleConvertButton() {
+                if (filesArray.length > 0) {
+                    convertButton.style.display = 'block';
+                } else {
+                    convertButton.style.display = 'none';
+                }
+            }
+
+          
       });
       </script>
       
