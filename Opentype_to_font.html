@@ -2,6 +2,18 @@
   <head>
     <link rel="stylesheet" type="text/css" href="style.css" />
 	<title>Opentype to font in js</title>
+
+  <style>
+    input[type="file"] {
+      display: none;
+    }
+
+    .custom-file-upload {
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: -10px;
+    }
+  </style>
   </head>
 
   <body>
@@ -11,120 +23,141 @@
 
     <div class="divider"></div>
     <div class="section">
+      <div class="title">Converter</div>
+
+      <div class="content">
+            
+        <div id="drop-zone" style="border-radius: 8px; border: 2px dashed #ccc; padding: 40px; text-align: center;">
+          <p style = 'margin: 0px;'>Drag & Drop files here</p>
+          or <label for="file-upload" class="custom-file-upload" multiple> Choose Files </label>
+          <input id="file-upload" type="file" />
+          <div id="file-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="divider"></div>
+    <div class="section">
       <div class="title">About</div>
 
-      <div class="copy_container">
-        This is a font conversion tool written in javascript. The script uses
-        <i>Opentype</i> library to load font files from a specific directory,
-        and then creates an array of objects that represent the data for each
-        font. When using the exported file, be sure to declare the array as a
-        variable. <br /><br />
-        Download converted JSON file in JS as...
-      </div>
-      <br />
+      <div class="content">
+        <div class="copy_container">
+          This is a font conversion tool written in javascript. The script uses
+          <i>Opentype</i> library to load font files from a specific directory,
+          and then creates an array of objects that represent the data for each
+          font. When using the exported file, be sure to declare the array as a
+          variable. <br /><br />
+          Download converted JSON file in JS as...
+        </div>
+        <br />
 
-      <div class="button_holder">
-        <div class="button" id="button_obj">Object</div>
-        <div class="button" id="button_arr">Array</div>
+        <div class="button_holder">
+          <div class="button" id="button_obj">Object</div>
+          <div class="button" id="button_arr">Array</div>
+        </div>
       </div>
     </div>
 
     <div class="divider"></div>
     <div class="section">
       <div class="title">What is in the file?</div>
-      <div class="copy_container">
-        <div class="list">
-          <div class="num">1.</div>
-          <div class="item">
-            The array comprises objects, each corresponding to a specific font
-            weight.
-          </div>
-        </div>
-
-        <div class="list">
-          <div class="num">2.</div>
-          <div class="item">
-            Within each object, there are two main components:
-            <i>Parameters</i> and <i>Letters.</i>
-          </div>
-        </div>
-
-        <div class="list">
-          <div class="num">3.</div>
-          <div class="item">
-            The <i>Parameters</i> section holds structural details, including
-            values for ascender, descender, etc. Additionally, there is an
-            <i>Info</i> array containing objects pertaining to individual
-            letters. An example of these parameters is as follows:
-            <br />
-            <div class="example_holder">
-              Ascender: 818
-              <br />
-              Baseline: 0
-              <br />
-              Cap Height: 715
-              <br />
-              Descender: -182
-              <br />
-              Italic Angle: 0
-              <br />
-              Name: "Helvetica Medium"
-              <br />
-              X Height: 517
+      <div class="content">
+        <div class="copy_container">
+          <div class="list">
+            <div class="num">1.</div>
+            <div class="item">
+              The array comprises objects, each corresponding to a specific font
+              weight.
             </div>
           </div>
-        </div>
 
-        <div class="list">
-          <div class="num">4.</div>
-          <div class="item">
-            The <i>Letters</i> section encompasses two types of objects:
-            <i>Info</i> and
-            <i>Path.</i>
-          </div>
-        </div>
-
-        <div class="list">
-          <div class="num">a.</div>
-          <div class="item">
-            <i>Info</i> provides specific information about a given letter. This
-            includes properties such as advance width, index, left-side bearing,
-            Unicode value, etc. For instance:
-            <br />
-            <div class="example_holder">
-              Advance Width: 602
-              <br />
-              Index: 22
-              <br />
-              Left-side Bearing: 67
-              <br />
-              Name: "K"
-              <br />
-              Unicode: 75
+          <div class="list">
+            <div class="num">2.</div>
+            <div class="item">
+              Within each object, there are two main components:
+              <i>Parameters</i> and <i>Letters.</i>
             </div>
           </div>
-        </div>
 
-        <div class="list">
-          <div class="num">b.</div>
-          <div class="item">
-            The <i>Path</i> object contains an array of paths required to draw
-            the letter. For each element in this array, a path is used to depict
-            the letter's shape. If there are multiple arrays, they represent
-            distinct paths. This can include paths that define both the letter
-            itself and the negative space within letters like <i>R</i> or
-            <i>B.</i> For example, if an array holds four elements, it signifies
-            four paths utilized to create the letter. <br /><br />
-            This structure facilitates the organization of font-related
-            information into a clear and manageable format.
+          <div class="list">
+            <div class="num">3.</div>
+            <div class="item">
+              The <i>Parameters</i> section holds structural details, including
+              values for ascender, descender, etc. Additionally, there is an
+              <i>Info</i> array containing objects pertaining to individual
+              letters. An example of these parameters is as follows:
+              <br />
+              <div class="example_holder">
+                Ascender: 818
+                <br />
+                Baseline: 0
+                <br />
+                Cap Height: 715
+                <br />
+                Descender: -182
+                <br />
+                Italic Angle: 0
+                <br />
+                Name: "Helvetica Medium"
+                <br />
+                X Height: 517
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="list">
-          <div class="num">5.</div>
-          <div class="item">
-            To view the actual example, view the browser in inspect mode to see
-            the console.
+          <div class="list">
+            <div class="num">4.</div>
+            <div class="item">
+              The <i>Letters</i> section encompasses two types of objects:
+              <i>Info</i> and
+              <i>Path.</i>
+            </div>
+          </div>
+
+          <div class="list">
+            <div class="num">a.</div>
+            <div class="item">
+              <i>Info</i> provides specific information about a given letter. This
+              includes properties such as advance width, index, left-side bearing,
+              Unicode value, etc. For instance:
+              <br />
+              <div class="example_holder">
+                Advance Width: 602
+                <br />
+                Index: 22
+                <br />
+                Left-side Bearing: 67
+                <br />
+                Name: "K"
+                <br />
+                Unicode: 75
+              </div>
+            </div>
+          </div>
+
+          <div class="list">
+            <div class="num">b.</div>
+            <div class="item">
+              The <i>Path</i> object contains an array of paths required to draw
+              the letter. For each element in this array, a path is used to depict
+              the letter's shape. If there are multiple arrays, they represent
+              distinct paths. This can include paths that define both the letter
+              itself and the negative space within letters like <i>R</i> or
+              <i>B.</i> For example, if an array holds four elements, it signifies
+              four paths utilized to create the letter. <br /><br />
+              This structure facilitates the organization of font-related
+              information into a clear and manageable format.
+            </div>
+          </div>
+
+          <div class="list">
+            <div class="num">5.</div>
+            <div class="item">
+              To view the actual example, view the browser in inspect mode to see
+              the console.
+            </div>
           </div>
         </div>
       </div>
@@ -133,11 +166,97 @@
     <div class="divider"></div>
     <div class="section">
       <div class="title">Last updated</div>
-      <div class="copy_container">Aug 15, 2023</div>
+      <div class="content">
+      <div class="copy_container">May 30, 2024</div>
+      </div>
     </div>
 
     <script src="js/opentype.min.js"></script>
-
+    <script>
+    
+      document.addEventListener('DOMContentLoaded', function() {
+          const dropZone = document.getElementById('drop-zone');
+          const fileList = document.getElementById('file-list');
+      
+          // Prevent default drag behaviors
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+              dropZone.addEventListener(eventName, preventDefaults, false);
+              document.body.addEventListener(eventName, preventDefaults, false);
+          });
+      
+          // Highlight drop zone when dragging over it
+          ['dragenter', 'dragover'].forEach(eventName => {
+              dropZone.addEventListener(eventName, highlight, false);
+          });
+      
+          ['dragleave', 'drop'].forEach(eventName => {
+              dropZone.addEventListener(eventName, unhighlight, false);
+          });
+      
+          // Handle dropped files
+          dropZone.addEventListener('drop', handleDrop, false);
+      
+          function preventDefaults(e) {
+              e.preventDefault();
+              e.stopPropagation();
+          }
+      
+          function highlight() {
+              dropZone.style.background = '#e1e7f0';
+          }
+      
+          function unhighlight() {
+              dropZone.style.background = '#f0f0f0';
+          }
+      
+          function handleDrop(e) {
+              const dt = e.dataTransfer;
+              const files = dt.files;
+      
+              handleFiles(files);
+          }
+      
+          function handleFiles(files) {
+              [...files].forEach(uploadFile);
+          }
+      
+          function uploadFile(file) {
+              const url = 'YOUR_UPLOAD_URL_HERE'; // Replace with your upload URL
+              const formData = new FormData();
+              formData.append('file', file);
+      
+              // You can use fetch or XMLHttpRequest to upload the file
+              fetch(url, {
+                  method: 'POST',
+                  body: formData
+              })
+              .then(response => {
+                  // Handle the response from the server
+                  console.log('File uploaded successfully!');
+                  const deleteButton = document.createElement('button');
+                  deleteButton.textContent = 'Delete';
+                  deleteButton.addEventListener('click', function() {
+                      fileList.removeChild(fileItem);
+                  });
+      
+                  const fileItem = document.createElement('div');
+                  fileItem.innerHTML = `<p>${file.name}</p>`;
+                  fileItem.appendChild(deleteButton);
+                  fileList.appendChild(fileItem);
+              })
+              .catch(error => {
+                  console.error('Error uploading file:', error);
+              });
+          }
+      
+          // Listen for file input change for traditional file selection
+          const fileInput = document.getElementById('file-upload');
+          fileInput.addEventListener('change', function() {
+              handleFiles(this.files);
+          });
+      });
+      </script>
+      
     <script>
       var letter_con = [];
       var numLoaded = 0;

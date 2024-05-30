@@ -26,11 +26,19 @@
       .section {
         margin-top: 88px;
         margin-left: 200px;
+        margin-right: 200px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
       }
 
       .title {
         font-style: italic;
         margin-bottom: 48px;
+        grid-column: 1 / 2;
+      }
+
+      .content{
+        grid-column: 3 / 5;
       }
 
       .copy_container {
