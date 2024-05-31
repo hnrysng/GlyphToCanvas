@@ -58,6 +58,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
         toggleConvertButton();
+        toggleMargin();
+        preConvertUpdate();
     }
 
     function uploadFile(file) {
@@ -79,10 +81,11 @@ document.addEventListener("DOMContentLoaded", function () {
             fileItem.remove();
             filesArray = filesArray.filter(f => f !== file);
             toggleConvertButton();
+            toggleMargin();
             preConvertUpdate(); //making sure it updates when files are removed
         });
+        
 
-        preConvertUpdate();
     }
 
     function toggleConvertButton() {
@@ -90,6 +93,14 @@ document.addEventListener("DOMContentLoaded", function () {
             convertButton.style.display = "block";
         } else {
             convertButton.style.display = "none";
+        }
+    }
+
+    function toggleMargin() {
+        if (filesArray.length > 0) {
+            document.getElementById('file-list').style.marginTop = '48px';
+        } else {
+            document.getElementById('file-list').style.marginTop = '0px';
         }
     }
 

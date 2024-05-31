@@ -16,7 +16,6 @@
 
 
       p{
-        /* margin:0; */
         display: inline-block;
       }
 
@@ -86,7 +85,7 @@
       #file_item {
         display: block;
         height: 30px;
-        margin-bottom: 24px;
+        margin-top: 24px;
       }
 
       .file_name {
@@ -116,6 +115,7 @@
         padding: 10px;
         border-radius: 100px;
         display: none; /* Initially hidden */
+        margin-top: 48px;
       }
 
       #convert-button:hover {
@@ -125,4 +125,39 @@
         color: white;
         transition-duration: 0.2s;
         cursor: pointer;
+      }
+
+
+
+
+      @media only screen and (max-width: 1280px) {
+
+        .divider {
+          margin-top: 80px;
+          margin-bottom: 24px;
+        }
+        
+        .section {
+          margin-top: 88px;
+          margin-left: 100px;
+          margin-right: 100px;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        .title {
+          font-style: italic;
+          margin-bottom: 48px;
+          grid-column: 1 / 5;
+        }
+
+        .content{
+          grid-column: 1 / 5;
+        }
+
+
+      .copy_container {
+        width: 100%;
+      }
+
       }
