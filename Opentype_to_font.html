@@ -1,57 +1,8 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="style.css" />
-	<title>Opentype to font in js</title>
+    <title>Opentype to font in js</title>
 
-  <style>
-    input[type="file"] {
-      display: none;
-    }
-
-    .custom-file-upload {
-      text-decoration: underline;
-      cursor: pointer;
-      margin-top: -10px;
-    }
-
-
-    #file_item{
-      display: block;
-      height: 30px;
-      margin-bottom: 24px;
-    }
-
-    .file_name{
-      vertical-align:middle; 
-      float: left;
-      margin: 0;
-    }
-
-    #delete {
-      cursor: pointer;
-      padding-top: 5px;
-      opacity: 0.5;
-      float: right;
-    }
-
-
-    #delete:hover {
-      cursor: pointer;
-      padding-left: 24px;
-      margin-bottom: -1px;
-      opacity: 1;
-    }
-
-    #convert-button{
-      width: 100%;
-      background-color: blue;
-      padding: 10px;
-      border-radius: 100px;
-      display: none; /* Initially hidden */
-    }
-
-
-  </style>
   </head>
 
   <body>
@@ -64,18 +15,27 @@
       <div class="title">Converter</div>
 
       <div class="content">
-            
-        <div id="drop-zone" style="border-radius: 8px; border: 2px dashed #ccc; padding: 40px; text-align: center;">
-          <p style = 'margin: 0px;'>Drag & Drop files here</p><br>
-          or <label for="file-upload" class="custom-file-upload"> Choose Files </label>
-          <input id="file-upload" type="file" multiple/>
+        <div
+          id="drop-zone"
+          style="
+            border-radius: 8px;
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+          "
+        >
+          <p style="margin: 0px">Drag & Drop files(WOFF/OTF/TTF) here</p>
+          <br />
+          or
+          <label for="file-upload" class="custom-file-upload">
+            Choose Files
+          </label>
+          <input id="file-upload" type="file" multiple />
           <div id="file-list"></div>
           <div id="convert-button">Convert Files</div>
         </div>
-
       </div>
     </div>
-
 
     <div class="divider"></div>
     <div class="section">
@@ -92,10 +52,6 @@
         </div>
         <br />
 
-        <div class="button_holder">
-          <div class="button" id="button_obj">Object</div>
-          <div class="button" id="button_arr">Array</div>
-        </div>
       </div>
     </div>
 
@@ -141,7 +97,7 @@
                 <br />
                 Name: "Helvetica Medium"
                 <br />
-                X Height: 517
+                X-Height: 517
               </div>
             </div>
           </div>
@@ -158,9 +114,9 @@
           <div class="list">
             <div class="num">a.</div>
             <div class="item">
-              <i>Info</i> provides specific information about a given letter. This
-              includes properties such as advance width, index, left-side bearing,
-              Unicode value, etc. For instance:
+              <i>Info</i> provides specific information about a given letter.
+              This includes properties such as advance width, index, left-side
+              bearing, Unicode value, etc. For instance:
               <br />
               <div class="example_holder">
                 Advance Width: 602
@@ -180,12 +136,13 @@
             <div class="num">b.</div>
             <div class="item">
               The <i>Path</i> object contains an array of paths required to draw
-              the letter. For each element in this array, a path is used to depict
-              the letter's shape. If there are multiple arrays, they represent
-              distinct paths. This can include paths that define both the letter
-              itself and the negative space within letters like <i>R</i> or
-              <i>B.</i> For example, if an array holds four elements, it signifies
-              four paths utilized to create the letter. <br /><br />
+              the letter. For each element in this array, a path is used to
+              depict the letter's shape. If there are multiple arrays, they
+              represent distinct paths. This can include paths that define both
+              the letter itself and the negative space within letters like
+              <i>R</i> or <i>B.</i> For example, if an array holds four
+              elements, it signifies four paths utilized to create the letter.
+              <br /><br />
               This structure facilitates the organization of font-related
               information into a clear and manageable format.
             </div>
@@ -194,8 +151,8 @@
           <div class="list">
             <div class="num">5.</div>
             <div class="item">
-              To view the actual example, view the browser in inspect mode to see
-              the console.
+              To view the actual example, view the browser in inspect mode to
+              see the console.
             </div>
           </div>
         </div>
@@ -206,235 +163,162 @@
     <div class="section">
       <div class="title">Last updated</div>
       <div class="content">
-      <div class="copy_container">May 30, 2024</div>
+        <div class="copy_container">May 30, 2024</div>
       </div>
     </div>
 
     <script src="js/opentype.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
     <script>
-    
-      document.addEventListener('DOMContentLoaded', function() {
-          const dropZone = document.getElementById('drop-zone');
-          const fileList = document.getElementById('file-list');
+      document.addEventListener("DOMContentLoaded", function () {
+        const dropZone = document.getElementById("drop-zone");
+        const fileList = document.getElementById("file-list");
 
-          const convertButton = document.getElementById('convert-button');
-          const fileInput = document.getElementById('file-upload');
-            let filesArray = [];
+        const convertButton = document.getElementById("convert-button");
+        const fileInput = document.getElementById("file-upload");
 
-      
-          // Prevent default drag behaviors
-          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-              dropZone.addEventListener(eventName, preventDefaults, false);
-              document.body.addEventListener(eventName, preventDefaults, false);
-          });
-      
-          // Highlight drop zone when dragging over it
-          ['dragenter', 'dragover'].forEach(eventName => {
-              dropZone.addEventListener(eventName, highlight, false);
-          });
-      
-          ['dragleave', 'drop'].forEach(eventName => {
-              dropZone.addEventListener(eventName, unhighlight, false);
-          });
-      
-          // Handle dropped files
-          dropZone.addEventListener('drop', handleDrop, false);
-      
-          fileInput.addEventListener('change', function() {
-                handleFiles(this.files);
-            });
-            
-          function preventDefaults(e) {
-              e.preventDefault();
-              e.stopPropagation();
-          }
-      
-          function highlight() {
-              dropZone.style.background = '#e1e7f0';
-          }
-      
-          function unhighlight() {
-              dropZone.style.background = '#f0f0f0';
-          }
-      
-          function handleDrop(e) {
-              const dt = e.dataTransfer;
-              const files = dt.files;
-      
-              handleFiles(files);
-          }
-      
+        var filesArray = [];
+        let letter_con = [];
+        let buffer_con = [];
 
-          function handleFiles(files) {
-                [...files].forEach(file => {
-                    if (!filesArray.includes(file)) {
-                        filesArray.push(file);
-                        uploadFile(file);
-                    }
-                });
-                toggleConvertButton();
+        // Prevent default drag behaviors
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropZone.addEventListener(eventName, preventDefaults, false);
+          document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop zone when dragging over it
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener("drop", handleDrop, false);
+
+        fileInput.addEventListener("change", function () {
+          handleFiles(this.files);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        function highlight() {
+          dropZone.style.background = "#e1e7f0";
+        }
+
+        function unhighlight() {
+          dropZone.style.background = "#f0f0f0";
+        }
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+
+          handleFiles(files);
+        }
+
+        function handleFiles(files) {
+          [...files].forEach((file) => {
+            if (!filesArray.includes(file)) {
+              filesArray.push(file);
+              uploadFile(file);
             }
+          });
+          toggleConvertButton();
+        }
 
-            function uploadFile(file) {
-                const url = 'YOUR_UPLOAD_URL_HERE'; // Replace with your upload URL
-                const formData = new FormData();
-                formData.append('file', file);
+        function uploadFile(file) {
+          const url = "YOUR_UPLOAD_URL_HERE"; // Replace with your upload URL
+          const formData = new FormData();
+          formData.append("file", file);
 
-                const file_item = document.createElement('div');
-                file_item.setAttribute('id', 'file_item');
-                file_item.innerHTML = `<p class='file_name'>${file.name}</p>`;
+          const file_item = document.createElement("div");
+          file_item.setAttribute("id", "file_item");
+          file_item.innerHTML = `<p class='file_name'>${file.name}</p>`;
 
-                const deleteButton = document.createElement('img');
-                deleteButton.setAttribute("id", "delete");
-                deleteButton.src='assets/delete.svg';
-                file_item.appendChild(deleteButton);
+          const deleteButton = document.createElement("img");
+          deleteButton.setAttribute("id", "delete");
+          deleteButton.src = "assets/delete.svg";
+          file_item.appendChild(deleteButton);
 
-                fileList.appendChild(file_item);
+          fileList.appendChild(file_item);
 
-                file_item.querySelector('#delete').addEventListener('click', () => {
-                    file_item.remove();
-                    filesArray = filesArray.filter(f => f !== file);
-                    toggleConvertButton();
-                });
+          file_item.querySelector("#delete").addEventListener("click", () => {
+            file_item.remove();
+            filesArray = filesArray.filter((f) => f !== file);
+            toggleConvertButton();
 
-            }
+            convert_update(); //making sure it updates when files are removed
+          });
 
-            function toggleConvertButton() {
-                if (filesArray.length > 0) {
-                    convertButton.style.display = 'block';
-                } else {
-                    convertButton.style.display = 'none';
-                }
-            }
+          convert_update();
+        }
 
-          
-      });
-      </script>
-      
-    <script>
-      var letter_con = [];
-      var numLoaded = 0;
+        function toggleConvertButton() {
+          if (filesArray.length > 0) {
+            convertButton.style.display = "block";
+          } else {
+            convertButton.style.display = "none";
+          }
+        }
 
+        function convert_update() {
+          buffer_con = [];
+          letter_con = [];
 
+          for (let i = 0; i < filesArray.length; i++) {
+            buffer_con[i] = filesArray[i].arrayBuffer();
 
-      let name = 'NeueHaasGroteskDisplayPro';
-
-      let fonts = [
-        "XXThin",
-        "XXThinItalic",
-        "XThin",
-        "XThinItalic",
-        "Thin",
-        "ThinItalic",
-        "Light",
-        "LightItalic",
-        "Roman",
-        "RomanItalic",
-        "Medium",
-        "MediumItalic",
-        "Bold",
-        "BoldItalic",
-        "Black",
-        "BlackItalic",
-      ];
-
-      for (let i = 0; i < fonts.length; i++) {
-        opentype.load(
-          "letter/Neue Haas Grotesk Display Pro/otf_converted/NeueHaasDisplay-" +
-            fonts[i] +
-            ".otf",
-
-          function (err, font) {
-            if (err) {
-              reject("Font could not be loaded: " + err);
-            } else {
+            buffer_con[i].then((data) => {
+              let font = opentype.parse(data);
               letter_con[i] = font;
-              numLoaded++;
-              checkAllLoaded();
-            }
+            });
           }
-        );
-      }
+        }
 
+        convertButton.addEventListener("click", function () {
+          for (let i = 0; i < letter_con.length; i++) {
+            ccnvert_1(letter_con[i]);
+          }
+        });
 
-      const font_to_export_obj = [];
-      const font_to_export_arr = [];
-
-      function checkAllLoaded() {
-        if (numLoaded == fonts.length) {
+        function ccnvert_1(font) {
+          let font_to_export_arr = [];
           let letter_path_con = [];
 
-          for (let i = 0; i < fonts.length; i++) {
-            letter_path_con.push({});
-            for (
-              let a = 0;
-              a < Object.keys(letter_con[0].glyphs.glyphs).length;
-              a++
-            ) {
-              letter_path_con[i][a] =
-                letter_con[i].glyphs.glyphs[a].path.commands;
-            }
+          for (let i = 0; i < Object.keys(font.glyphs.glyphs).length; i++) {
+            letter_path_con[i] = font.glyphs.glyphs[i].path.commands;
           }
 
-          console.log("Opentype");
-          console.log("letter_con");
-          console.log(letter_con);
+          font_to_export_arr = {
+            parameters: {
+              name: font.names.fullName.en,
+              ascender: font.tables.os2.sTypoAscender,
+              cap_height: font.tables.os2.sCapHeight,
+              x_height: font.tables.os2.sxHeight,
+              baseline: 0,
+              descender: font.tables.os2.sTypoDescender,
+              italic_angle: font.tables.post.italicAngle,
+            },
+            letters: {
+              info: font.glyphs.glyphs,
+              path: letter_path_con,
+            },
+          };
 
-          for (let i = 0; i < fonts.length; i++) {
-            font_to_export_obj[i] = {
-              parameters: {
-                name: letter_con[i].names.fullName.en,
-                ascender: letter_con[i].tables.os2.sTypoAscender,
-                cap_height: letter_con[i].tables.os2.sCapHeight,
-                x_height: letter_con[i].tables.os2.sxHeight,
-                baseline: 0,
-                descender: letter_con[i].tables.os2.sTypoDescender,
-                italic_angle: letter_con[i].tables.post.italicAngle,
-              },
-              letters: {
-                info: letter_con[i].glyphs.glyphs,
-                path: letter_path_con[i],
-              },
-            };
+          let path_converted_arr = path_convert(font_to_export_arr).letter_reconstructed_con;
 
-            font_to_export_arr[i] = {
-              parameters: {
-                name: letter_con[i].names.fullName.en,
-                ascender: letter_con[i].tables.os2.sTypoAscender,
-                cap_height: letter_con[i].tables.os2.sCapHeight,
-                x_height: letter_con[i].tables.os2.sxHeight,
-                baseline: 0,
-                descender: letter_con[i].tables.os2.sTypoDescender,
-                italic_angle: letter_con[i].tables.post.italicAngle,
-              },
-              letters: {
-                info: letter_con[i].glyphs.glyphs,
-                path: letter_path_con[i],
-              },
-            };
-          }
-
-          let path_converted_obj =
-            path_convert(font_to_export_obj).letter_path_con;
-          let path_converted_arr =
-            path_convert(font_to_export_arr).letter_reconstructed_con;
-
-          for (let i = 0; i < font_to_export_obj.length; i++) {
-            for (
-              let j = 0;
-              j < Object.entries(font_to_export_obj[i].letters.path).length;
-              j++
-            ) {
-              font_to_export_obj[i].letters.path = path_converted_obj[i];
+          for (let i = 0; i < font_to_export_arr.length; i++) {
+            for (let j = 0; j < Object.entries(font_to_export_arr[i].letters.path).length; j++) {
               font_to_export_arr[i].letters.path = path_converted_arr[i];
             }
           }
-
-          console.log("Object");
-          console.log("path_converted_obj");
-          console.log(path_converted_obj);
-          console.log("font_to_export_obj");
-          console.log(font_to_export_obj);
 
           console.log("Array");
           console.log("path_converted_arr");
@@ -442,289 +326,176 @@
           console.log("font_to_export_arr");
           console.log(font_to_export_arr);
 
-
-
-
-          function downloadJSON_obj() {
-            const json = "var " + name + "_Obj = " + JSON.stringify(font_to_export_obj);
-            const blob = new Blob([json], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = name  + "_data_obj.js";
-            link.click();
-          }
-
           function downloadJSON_arr() {
             const json = "var " + name + "_Arr = " + JSON.stringify(font_to_export_arr);
             const blob = new Blob([json], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = name  + "_data_arr.js";
+            link.download = name + "_data_arr.js";
             link.click();
           }
-
-          const button_obj = document.getElementById("button_obj");
-          button_obj.addEventListener("click", downloadJSON_obj);
-
-          const button_arr = document.getElementById("button_arr");
-          button_arr.addEventListener("click", downloadJSON_arr);
         }
-      }
 
-      function path_convert(font_before_export) {
-        let letter_con = [];
-        let letter_reconstructed_con = [];
-        let num_of_lines_con = [];
-        let line_index_con = [];
+        function path_convert(font_before_export) {
+          let letter_con = [];
+          let letter_reconstructed_con = [];
+          let num_of_lines_con = [];
+          let line_index_con = [];
 
-        for (let i = 0; i < font_before_export.length; i++) {
-          line_index_con[i] = [];
-          num_of_lines_con[i] = [];
-          for (
-            let a = 0;
-            a < Object.entries(font_before_export[i].letters.path).length;
-            a++
-          ) {
-            line_index_con[i][a] = 0;
-            num_of_lines_con[i][a] = 0;
+          for (let i = 0; i < Object.entries(font_before_export.letters.path).length; i++) {
+            line_index_con[i] = 0;
+            num_of_lines_con[i] = 0;
 
-            for (
-              let n = 0;
-              n < Object.entries(font_before_export[i].letters.path[a]).length;
-              n++
-            ) {
-              if (font_before_export[i].letters.path[a][n].type == "Z") {
-                num_of_lines_con[i][a]++;
+            for (let a = 0; a < Object.entries(font_before_export.letters.path[i]).length; a++) {
+              if (font_before_export.letters.path[i][a].type == "Z") {
+                num_of_lines_con[i]++;
               }
             }
           }
-        }
 
-        for (let i = 0; i < font_before_export.length; i++) {
-          letter_con[i] = [];
-          letter_reconstructed_con[i] = [];
+          for (let i = 0; i < Object.entries(font_before_export.letters.path).length; i++) {
+            letter_con[i] = [];
+            letter_reconstructed_con[i] = [];
 
-          for (
-            let a = 0;
-            a < Object.entries(font_before_export[i].letters.path).length;
-            a++
-          ) {
-            letter_con[i][a] = [];
-            letter_reconstructed_con[i][a] = [];
-
-            for (let n = 0; n < num_of_lines_con[i][a]; n++) {
-              letter_con[i][a][n] = [];
-              letter_reconstructed_con[i][a][n] = [];
+            for (let a = 0; a < num_of_lines_con[i]; a++) {
+              letter_con[i][a] = [];
+              letter_reconstructed_con[i][a] = [];
             }
           }
-        }
 
-        for (let i = 0; i < font_before_export.length; i++) {
-          for (
-            let a = 0;
-            a < Object.entries(font_before_export[i].letters.path).length;
-            a++
-          ) {
-            for (
-              let n = 0;
-              n < font_before_export[i].letters.path[a].length;
-              n++
-            ) {
-              if (font_before_export[i].letters.path[a][n].type !== "Z") {
-                letter_con[i][a][line_index_con[i][a]].push(
-                  font_before_export[i].letters.path[a][n]
-                );
+          for (let i = 0; i < Object.entries(font_before_export.letters.path).length; i++) {
+            for (let a = 0; a < font_before_export.letters.path[i].length; a++) {
+              if (font_before_export.letters.path[i][a].type !== "Z") {
+                letter_con[i][line_index_con[i]].push(font_before_export.letters.path[i][a]);
               } else {
-                letter_con[i][a][line_index_con[i][a]].push(
-                  font_before_export[i].letters.path[a][n]
-                );
-                line_index_con[i][a]++;
+                letter_con[i][line_index_con[i]].push(font_before_export.letters.path[i][a]);
+                line_index_con[i]++;
               }
             }
           }
-        }
 
-        for (let i = 0; i < letter_con.length; i++) {
-          for (let a = 0; a < letter_con[i].length; a++) {
-            for (let n = 0; n < letter_con[i][a].length; n++) {
-              for (let x = 0; x < letter_con[i][a][n].length; x++) {
-                letter_reconstructed_con[i][a][n][x] = {};
+          for (let a = 0; a < letter_con.length; a++) {
+            for (let n = 0; n < letter_con[a].length; n++) {
+              for (let x = 0; x < letter_con[a][n].length; x++) {
 
-                if (letter_con[i][a][n][x].type == "M") {
-                  letter_reconstructed_con[i][a][n][x].x =
-                    letter_con[i][a][n][x].x;
-                  letter_reconstructed_con[i][a][n][x].y =
-                    letter_con[i][a][n][x].y;
-                  letter_reconstructed_con[i][a][n][x].in_x =
-                    letter_con[i][a][n][x].x;
-                  letter_reconstructed_con[i][a][n][x].in_y =
-                    letter_con[i][a][n][x].y;
-                  letter_reconstructed_con[i][a][n][x].out_x =
-                    letter_con[i][a][n][x].x;
-                  letter_reconstructed_con[i][a][n][x].out_y =
-                    letter_con[i][a][n][x].y;
+                letter_reconstructed_con[a][n][x] = {};
+
+                if (letter_con[a][n][x].type == "M") {
+                  letter_reconstructed_con[a][n][x].x = letter_con[a][n][x].x;
+                  letter_reconstructed_con[a][n][x].y = letter_con[a][n][x].y;
+                  letter_reconstructed_con[a][n][x].in_x = letter_con[a][n][x].x;
+                  letter_reconstructed_con[a][n][x].in_y = letter_con[a][n][x].y;
+                  letter_reconstructed_con[a][n][x].out_x = letter_con[a][n][x].x;
+                  letter_reconstructed_con[a][n][x].out_y = letter_con[a][n][x].y;
                 }
 
-                if (letter_con[i][a][n][x].type == "C") {
-                  if (letter_con[i][a][n][x + 1].type == "Z") {
-                    letter_reconstructed_con[i][a][n][x].x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].y =
-                      letter_con[i][a][n][x].y;
-                    letter_reconstructed_con[i][a][n][x - 1].out_x =
-                      letter_con[i][a][n][x].x1;
-                    letter_reconstructed_con[i][a][n][x - 1].out_y =
-                      letter_con[i][a][n][x].y1;
+                if (letter_con[a][n][x].type == "C") {
+                  if (letter_con[a][n][x + 1].type == "Z") {
+                    letter_reconstructed_con[a][n][x].x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].y = letter_con[a][n][x].y;
+                    letter_reconstructed_con[a][n][x - 1].out_x = letter_con[a][n][x].x1;
+                    letter_reconstructed_con[a][n][x - 1].out_y = letter_con[a][n][x].y1;
 
-                    if (
-                      letter_reconstructed_con[i][a][n][x].x !==
-                      letter_reconstructed_con[i][a][n][0].x
-                    ) {
-                      letter_reconstructed_con[i][a][n][x].in_x =
-                        letter_con[i][a][n][x].x2;
-                      letter_reconstructed_con[i][a][n][x].in_y =
-                        letter_con[i][a][n][x].y2;
-                      letter_reconstructed_con[i][a][n][x].out_x =
-                        letter_con[i][a][n][x].x;
-                      letter_reconstructed_con[i][a][n][x].out_y =
-                        letter_con[i][a][n][x].y;
+                    if (letter_reconstructed_con[a][n][x].x !== letter_reconstructed_con[a][n][0].x) {
+                      letter_reconstructed_con[a][n][x].in_x = letter_con[a][n][x].x2;
+                      letter_reconstructed_con[a][n][x].in_y = letter_con[a][n][x].y2;
+                      letter_reconstructed_con[a][n][x].out_x = letter_con[a][n][x].x;
+                      letter_reconstructed_con[a][n][x].out_y = letter_con[a][n][x].y;
                     } else {
-                      letter_reconstructed_con[i][a][n][0].in_x =
-                        letter_con[i][a][n][x].x2;
-                      letter_reconstructed_con[i][a][n][0].in_y =
-                        letter_con[i][a][n][x].y2;
+                      letter_reconstructed_con[a][n][0].in_x = letter_con[a][n][x].x2;
+                      letter_reconstructed_con[a][n][0].in_y = letter_con[a][n][x].y2;
                     }
                   } else {
-                    letter_reconstructed_con[i][a][n][x].x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].y =
-                      letter_con[i][a][n][x].y;
-                    letter_reconstructed_con[i][a][n][x].in_x =
-                      letter_con[i][a][n][x].x2;
-                    letter_reconstructed_con[i][a][n][x].in_y =
-                      letter_con[i][a][n][x].y2;
-                    letter_reconstructed_con[i][a][n][x - 1].out_x =
-                      letter_con[i][a][n][x].x1;
-                    letter_reconstructed_con[i][a][n][x - 1].out_y =
-                      letter_con[i][a][n][x].y1;
+                    letter_reconstructed_con[a][n][x].x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].y = letter_con[a][n][x].y;
+                    letter_reconstructed_con[a][n][x].in_x = letter_con[a][n][x].x2;
+                    letter_reconstructed_con[a][n][x].in_y = letter_con[a][n][x].y2;
+                    letter_reconstructed_con[a][n][x - 1].out_x = letter_con[a][n][x].x1;
+                    letter_reconstructed_con[a][n][x - 1].out_y = letter_con[a][n][x].y1;
                   }
                 }
 
-                if (letter_con[i][a][n][x].type == "L") {
-                  if (letter_con[i][a][n][x - 1].type == "C") {
-                    letter_reconstructed_con[i][a][n][x].x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].y =
-                      letter_con[i][a][n][x].y;
-                    letter_reconstructed_con[i][a][n][x].in_x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].in_y =
-                      letter_con[i][a][n][x].y;
-                    letter_reconstructed_con[i][a][n][x - 1].out_x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x - 1].out_y =
-                      letter_con[i][a][n][x].y;
-                    letter_reconstructed_con[i][a][n][x].out_x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].out_y =
-                      letter_con[i][a][n][x].y;
+                if (letter_con[a][n][x].type == "L") {
+                  if (letter_con[a][n][x - 1].type == "C") {
+                    letter_reconstructed_con[a][n][x].x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].y = letter_con[a][n][x].y;
+                    letter_reconstructed_con[a][n][x].in_x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].in_y = letter_con[a][n][x].y;
+                    letter_reconstructed_con[a][n][x - 1].out_x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x - 1].out_y = letter_con[a][n][x].y;
+                    letter_reconstructed_con[a][n][x].out_x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].out_y = letter_con[a][n][x].y;
                   } else {
-                    letter_reconstructed_con[i][a][n][x].x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].y =
-                      letter_con[i][a][n][x].y;
-                    letter_reconstructed_con[i][a][n][x].in_x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].in_y =
-                      letter_con[i][a][n][x].y;
-                    letter_reconstructed_con[i][a][n][x].out_x =
-                      letter_con[i][a][n][x].x;
-                    letter_reconstructed_con[i][a][n][x].out_y =
-                      letter_con[i][a][n][x].y;
+                    letter_reconstructed_con[a][n][x].x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].y = letter_con[a][n][x].y;
+                    letter_reconstructed_con[a][n][x].in_x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].in_y = letter_con[a][n][x].y;
+                    letter_reconstructed_con[a][n][x].out_x = letter_con[a][n][x].x;
+                    letter_reconstructed_con[a][n][x].out_y = letter_con[a][n][x].y;
                   }
                 }
               }
             }
           }
-        }
 
-        for (let i = 0; i < letter_con.length; i++) {
-          for (let a = 0; a < letter_con[i].length; a++) {
-            for (let n = 0; n < letter_con[i][a].length; n++) {
-              if (
-                letter_con[i][a][n][letter_con[i][a][n].length - 2].x ==
-                  letter_con[i][a][n][0].x &&
-                letter_con[i][a][n][letter_con[i][a][n].length - 2].y ==
-                  letter_con[i][a][n][0].y
-              ) {
-                letter_reconstructed_con[i][a][n].splice(-2);
+          for (let a = 0; a < letter_con.length; a++) {
+            for (let n = 0; n < letter_con[a].length; n++) {
+              if (letter_con[a][n][letter_con[a][n].length - 2].x ==letter_con[a][n][0].x && letter_con[a][n][letter_con[a][n].length - 2].y ==letter_con[a][n][0].y) {
+                letter_reconstructed_con[a][n].splice(-2);
               } else {
-                letter_reconstructed_con[i][a][n].splice(-1);
+                letter_reconstructed_con[a][n].splice(-1);
               }
             }
           }
-        }
 
-        let path_num_property_con = [];
+          let path_num_property_con = [];
 
-        let point_num_property_con = [];
+          let point_num_property_con = [];
 
-        for (let i = 0; i < letter_reconstructed_con.length; i++) {
-          path_num_property_con[i] = [];
-          point_num_property_con[i] = [];
-          for (let j = 0; j < letter_reconstructed_con[i].length; j++) {
-            path_num_property_con[i][j] = [];
-            point_num_property_con[i][j] = [];
-            for (let k = 0; k < letter_reconstructed_con[i][j].length; k++) {
-              path_num_property_con[i][j].push("path_" + k);
-              point_num_property_con[i][j][k] = [];
-              for (
-                let x = 0;
-                x < letter_reconstructed_con[i][j][k].length;
-                x++
-              ) {
-                point_num_property_con[i][j][k].push("p" + x);
+          for (let j = 0; j < letter_reconstructed_con.length; j++) {
+            path_num_property_con[j] = [];
+            point_num_property_con[j] = [];
+            for (let k = 0; k < letter_reconstructed_con[j].length; k++) {
+              path_num_property_con[j].push("path_" + k);
+              point_num_property_con[j][k] = [];
+              for (let x = 0; x < letter_reconstructed_con[j][k].length; x++) {
+                point_num_property_con[j][k].push("p" + x);
               }
             }
           }
-        }
 
-        function convert(t_1, t_2) {
-          let paths_test = {};
+          function convert(t) {
 
-          for (let i = 0; i < path_num_property_con[t_1][t_2].length; i++) {
-            let pathName = path_num_property_con[t_1][t_2][i];
-            let pathPoints = {};
+            let paths_test = {};
 
-            for (
-              let j = 0;
-              j < point_num_property_con[t_1][t_2][i].length;
-              j++
-            ) {
-              let pointName = point_num_property_con[t_1][t_2][i][j];
-              pathPoints[pointName] = letter_reconstructed_con[t_1][t_2][i][j];
+            for (let i = 0; i < path_num_property_con[t].length; i++) {
+              let pathName = path_num_property_con[t][i];
+              let pathPoints = {};
+
+              for (let j = 0; j < point_num_property_con[t][i].length; j++) {
+                let pointName = point_num_property_con[t][i][j];
+                pathPoints[pointName] = letter_reconstructed_con[t][i][j];
+              }
+
+              paths_test[pathName] = pathPoints;
             }
 
-            paths_test[pathName] = pathPoints;
+            return paths_test;
           }
 
-          return paths_test;
-        }
+          let letter_path_con = [];
 
-        let letter_path_con = [];
-
-        for (let i = 0; i < path_num_property_con.length; i++) {
-          letter_path_con[i] = [];
-
-          for (let j = 0; j < path_num_property_con[i].length; j++) {
-            letter_path_con[i].push(convert(i, j));
+          for (let i = 0; i < path_num_property_con.length; i++) {
+            letter_path_con.push(convert(i));
           }
-        }
 
-        return { letter_path_con, letter_reconstructed_con };
-      }
+          console.log(letter_path_con);
+          console.log(letter_reconstructed_con);
+
+          return { letter_path_con, letter_reconstructed_con };
+        }
+      });
     </script>
   </body>
 </html>
