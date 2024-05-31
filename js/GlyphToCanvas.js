@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const json = "var " + font.names.fullName.en.replace(/ /g, "_") + " = " + JSON.stringify(fontToExportArr);
         const blob = new Blob([json], { type: "application/json" });
-        convertedFiles.push({ name: font.names.fullName.en + "_data_arr.js", blob });
+        convertedFiles.push({ name: font.names.fullName.en + "_data.js", blob });
     }
 
     function pathConvert(fontBeforeExport) {
