@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        const json = "var " + font.names.postScriptName.en + " = " + JSON.stringify(fontToExportArr);
+        const json = "var " + font.names.fullName.en + " = " + JSON.stringify(fontToExportArr);
         const blob = new Blob([json], { type: "application/json" });
         convertedFiles.push({ name: font.names.fullName.en + "_data_arr.js", blob });
     }
