@@ -122,10 +122,11 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < letterCon.length; i++) {
             convert(letterCon[i]);
         }
-        createZipAndDownload();
+        // createZipAndDownload();
     });
 
     function convert(font) {
+        
         let fontToExportArr = [];
         let letterPathCon = [];
 
@@ -145,18 +146,11 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             letters: {
                 info: font.glyphs.glyphs,
-                path: letterPathCon
+                path: pathConvert(letterPathCon).letterReconstructedCon
             }
         };
 
-        let pathConvertedArr = pathConvert(fontToExportArr).letterReconstructedCon;
-
-        for (let i = 0; i < fontToExportArr.length; i++) {
-            for (let j = 0; j < Object.entries(fontToExportArr[i].letters.path).length; j++) {
-                fontToExportArr[i].letters.path = pathConvertedArr[i];
-            }
-        }
-
+        
         const json = "var " + font.names.fullName.en.replace(/ /g, "_") + " = " + JSON.stringify(fontToExportArr);
         const blob = new Blob([json], { type: "application/json" });
         convertedFiles.push({ name: font.names.fullName.en + "_data.js", blob });
@@ -168,18 +162,18 @@ document.addEventListener("DOMContentLoaded", function () {
         let numOfLinesCon = [];
         let lineIndexCon = [];
 
-        for (let i = 0; i < Object.entries(fontBeforeExport.letters.path).length; i++) {
+        for (let i = 0; i < Object.entries(fontBeforeExport).length; i++) {
             lineIndexCon[i] = 0;
             numOfLinesCon[i] = 0;
 
-            for (let a = 0; a < Object.entries(fontBeforeExport.letters.path[i]).length; a++) {
-                if (fontBeforeExport.letters.path[i][a].type === "Z") {
+            for (let a = 0; a < Object.entries(fontBeforeExport[i]).length; a++) {
+                if (fontBeforeExport[i][a].type === "Z") {
                     numOfLinesCon[i]++;
                 }
             }
         }
 
-        for (let i = 0; i < Object.entries(fontBeforeExport.letters.path).length; i++) {
+        for (let i = 0; i < Object.entries(fontBeforeExport).length; i++) {
             letterCon[i] = [];
             letterReconstructedCon[i] = [];
 
@@ -189,12 +183,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        for (let i = 0; i < Object.entries(fontBeforeExport.letters.path).length; i++) {
-            for (let a = 0; a < fontBeforeExport.letters.path[i].length; a++) {
-                if (fontBeforeExport.letters.path[i][a].type !== "Z") {
-                    letterCon[i][lineIndexCon[i]].push(fontBeforeExport.letters.path[i][a]);
+        for (let i = 0; i < Object.entries(fontBeforeExport).length; i++) {
+            for (let a = 0; a < fontBeforeExport[i].length; a++) {
+                if (fontBeforeExport[i][a].type !== "Z") {
+                    letterCon[i][lineIndexCon[i]].push(fontBeforeExport[i][a]);
                 } else {
-                    letterCon[i][lineIndexCon[i]].push(fontBeforeExport.letters.path[i][a]);
+                    letterCon[i][lineIndexCon[i]].push(fontBeforeExport[i][a]);
                     lineIndexCon[i]++;
                 }
             }
