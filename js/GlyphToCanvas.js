@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < letterCon.length; i++) {
             convert(letterCon[i]);
         }
-        // createZipAndDownload();
+        createZipAndDownload();
     });
 
     function convert(font) {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         };
 
-        
+
         const json = "var " + font.names.fullName.en.replace(/ /g, "_") + " = " + JSON.stringify(fontToExportArr);
         const blob = new Blob([json], { type: "application/json" });
         convertedFiles.push({ name: font.names.fullName.en + "_data.js", blob });
