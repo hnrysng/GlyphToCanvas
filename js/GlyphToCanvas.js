@@ -126,6 +126,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function convert(font) {
+
+        console.log(font)
+
+
+        const glyphs = font.glyphs.glyphs;
+        const glyphList = Object.values(glyphs); // Only keep glyphs with unicode values
+    
+        const kerningPairs = {}; // { "A V": -80, ... }
+    
+        for (let i = 0; i < glyphList.length; i++) {
+            for (let j = 0; j < glyphList.length; j++) {
+                const leftGlyph = glyphList[i];
+                const rightGlyph = glyphList[j];
+    
+                const kerning = font.getKerningValue(leftGlyph, rightGlyph);
+    
+                if (kerning !== 0) {
+                    const key = `${leftGlyph.index}_${rightGlyph.index}`;
+                    kerningPairs[key] = kerning;
+                }
+            }
+        }
+    
         
         let fontToExportArr = [];
         let letterPathCon = [];
@@ -146,10 +169,13 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             letters: {
                 info: font.glyphs.glyphs,
-                path: pathConvert(letterPathCon).letterReconstructedCon
+                path: pathConvert(letterPathCon).letterReconstructedCon,
+                kern: kerningPairs
             }
         };
 
+        console.log(kerningPairs)
+        console.log(fontToExportArr)
 
         const json = "var " + font.names.fullName.en.replace(/ /g, "_") + " = " + JSON.stringify(fontToExportArr);
         const blob = new Blob([json], { type: "application/json" });
@@ -215,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             letterReconstructedCon[a][n][x - 1].out_x = letterCon[a][n][x].x1;
                             letterReconstructedCon[a][n][x - 1].out_y = letterCon[a][n][x].y1;
 
-                            if (letterReconstructedCon[a][n][x].x !== letterReconstructedCon[a][n][0].x) {
+                            if (letterReconstructedCon[a][n][x].x !== letterReconstructedCon[a][n][0].x || letterReconstructedCon[a][n][x].y !== letterReconstructedCon[a][n][0].y) {
                                 letterReconstructedCon[a][n][x].in_x = letterCon[a][n][x].x2;
                                 letterReconstructedCon[a][n][x].in_y = letterCon[a][n][x].y2;
                                 letterReconstructedCon[a][n][x].out_x = letterCon[a][n][x].x;
@@ -224,6 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 letterReconstructedCon[a][n][0].in_x = letterCon[a][n][x].x2;
                                 letterReconstructedCon[a][n][0].in_y = letterCon[a][n][x].y2;
                             }
+                            
                         } else {
                             letterReconstructedCon[a][n][x].x = letterCon[a][n][x].x;
                             letterReconstructedCon[a][n][x].y = letterCon[a][n][x].y;
